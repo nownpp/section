@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> MR Yousef </title>
+    <!-- استدعاء Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- استدعاء خط Tajawal للغة العربية -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Tajawal', sans-serif;
+        }
+        /* تأثيرات حركية بسيطة */
+        .fade-in {
+            animation: fadeIn 0.4s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* تأثير تأخير النقاط المرتدة في شاشة التحميل */
+        .delay-100 { animation-delay: 100ms; }
+        .delay-200 { animation-delay: 200ms; }
+
+        /* -- تصميم كلمة Yousef بتأثير الاندماج والحركة المستقلة -- */
+        .name-wrapper {
+            display: inline-flex;
+            direction: ltr; /* لضمان ترتيب الحروف بالإنجليزية */
+            margin-right: 8px; /* مسافة بين مستر والاسم */
+            font-family: 'Arial Black', Impact, sans-serif;
+            font-size: 1.3em;
+            animation: wrapperMerge 6s infinite ease-in-out;
+            padding: 0 5px;
+        }
+
+        /* تحريك المسافة بين الحروف لعمل تأثير الاندماج */
+        @keyframes wrapperMerge {
+            0%, 15% { letter-spacing: -25px; } /* مندمجة في نقطة واحدة */
+            30%, 75% { letter-spacing: 2px; }  /* تتمدد لحالتها الطبيعية */
+            90%, 100% { letter-spacing: -25px; } /* تعود للاندماج */
+        }
+
+        .letter {
+            display: inline-block;
+            animation: letterDance 6s infinite ease-in-out;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        /* تأخير كل حرف ليظهر ويتحرك بشكل مستقل (حرف بحرف) */
+        .l-1 { animation-delay: 0.0s; }
+        .l-2 { animation-delay: 0.15s; }
+        .l-3 { animation-delay: 0.3s; }
+        .l-4 { animation-delay: 0.45s; }
+        .l-5 { animation-delay: 0.6s; }
+        .l-6 { animation-delay: 0.75s; }
+
+        /* حركة الحرف نفسه (يختفي، يظهر يكبر، يغير لونه، ويهتز) */
+        @keyframes letterDance {
+            0%, 15% { opacity: 0; transform: scale(0.1) rotate(0deg); color: #4f46e5; }
+            25% { opacity: 1; transform: scale(1.3) translateY(-4px) rotate(-15deg); color: #ec4899; }
+            35% { opacity: 1; transform: scale(1) translateY(0) rotate(0deg); color: #4f46e5; }
+            50% { transform: scale(1.2) rotate(10deg); color: #06b6d4; }
+            60% { transform: scale(1) rotate(0deg); color: #4f46e5; }
+            75% { opacity: 1; transform: scale(1.2) rotate(-10deg); color: #8b5cf6; }
+            85%, 100% { opacity: 0; transform: scale(0.1) rotate(0deg); color: #4f46e5; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen flex items-center justify-center p-4 sm:p-8 text-gray-800">
+
+    <!-- شاشة التحميل -->
+    <div id="loader" class="fixed inset-0 bg-gray-50 flex flex-col items-center justify-center z-50 transition-opacity duration-700">
+        <div class="text-3xl sm:text-5xl font-black text-indigo-800 animate-pulse text-center space-y-4">
+            <span class="text-5xl block mb-2"></span>
+            <p> صل على النبى  </p>
+        </div>
+        <div class="mt-8 flex gap-2">
+            <div class="w-3.5 h-3.5 bg-indigo-500 rounded-full animate-bounce"></div>
+            <div class="w-3.5 h-3.5 bg-indigo-500 rounded-full animate-bounce delay-100"></div>
+            <div class="w-3.5 h-3.5 bg-indigo-500 rounded-full animate-bounce delay-200"></div>
+        </div>
+    </div>
+
+    <!-- حاوية التطبيق الرئيسية (مخفية في البداية) -->
+    <div id="app-container" class="w-full max-w-2xl hidden opacity-0 transition-opacity duration-700">
+        <!-- سيتم حقن المحتوى هنا بواسطة JavaScript -->
+    </div>
+
+    <script>
+        // تعريف أيقونات SVG لاستخدامها في الواجهة
+        const icons = {
+            beakerBlue: `<svg class="w-12 h-12 text-blue-500 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 3h15"/><path d="M6 3v16a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V3"/><path d="M6 14h12"/></svg>`,
+            flaskOrange: `<svg class="w-12 h-12 text-orange-500 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 2v7.527a2 2 0 0 1-.211.896L4.72 20.55a1 1 0 0 0 .9 1.45h12.76a1 1 0 0 0 .9-1.45l-5.069-10.127A2 2 0 0 1 14 9.527V2"/><path d="M8.5 2h7"/><path d="M7 16h10"/></svg>`,
+            testTubePurple: `<svg class="w-12 h-12 text-purple-500 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2v17.5c0 1.4-1.1 2.5-2.5 2.5h0c-1.4 0-2.5-1.1-2.5-2.5V2"/><path d="M8.5 2h7"/><path d="M9.5 16h5"/></svg>`,
+            testTubeRed: `<svg class="w-12 h-12 text-red-500 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2v17.5c0 1.4-1.1 2.5-2.5 2.5h0c-1.4 0-2.5-1.1-2.5-2.5V2"/><path d="M8.5 2h7"/><path d="M9.5 16h5"/></svg>`,
+            beakerPink: `<svg class="w-12 h-12 text-pink-500 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 3h15"/><path d="M6 3v16a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V3"/><path d="M6 14h12"/></svg>`,
+            checkCircleLg: `<svg class="w-12 h-12 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`,
+            checkCircleSm: `<svg class="w-3 h-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>`,
+            arrowRight: `<svg class="w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>`,
+            arrowLeft: `<svg class="w-6 h-6 text-gray-300 group-hover:text-indigo-500 transform group-hover:-translate-x-2 transition-all" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>`,
+            rotateCcw: `<svg class="w-5 h-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>`
+        };
+
+        // قاعدة بيانات الخطوات
+        const stepsData = {
+            start: {
+                title: "الخطوة 1: الذوبانية (الفحص الفيزيائي)",
+                typeTag: '<span class="inline-flex items-center gap-1 bg-blue-100 text-blue-800 text-sm font-bold px-3 py-1 rounded-full mb-3 border border-blue-200">💧🧊 تُجرى على المادة الصلبة + الماء</span>',
+                instruction: "<b>خطوات اختبار الذوبانية:</b><br><ol class='list-decimal list-inside mt-2 text-sm space-y-1.5 text-right w-full font-semibold text-amber-950'><li>في أنبوبة اختبار نظيفة، ضع كمية صغيرة من <b>المادة الصلبة</b>.</li><li>أضف حوالي 2-3 مل من <b>الماء المقطر البارد</b>.</li><li>رُج الأنبوبة جيداً لعدة ثوانٍ.</li><li>لاحظ هل اختفت المادة (ذابت) أم ترسبت كما هي (لم تذب)؟</li></ol>",
+                question: "هل ذابت المادة في الماء البارد؟",
+                options: [
+                    { text: "نعم، ذابت تماماً (المادة عبارة عن ملح)", target: "salt_fecl3", note: "المادة ملح" },
+                    { text: "لا، لم تذب (المادة عبارة عن حمض)", target: "acid_fecl3", note: "المادة حمض" }
+                ],
+                icon: icons.beakerBlue
+            },
+            salt_fecl3: {
+                title: "الخطوة 2: تحديد الشق الحامضي للملح",
+                typeTag: '<span class="inline-flex items-center gap-1 bg-purple-100 text-purple-800 text-sm font-bold px-3 py-1 rounded-full mb-3 border border-purple-200">💧 تُجرى على المحلول الجاهز</span>',
+                instruction: "المادة ذابت (ملح). <b>خطوات إضافة كلوريد الحديديك:</b><br><ol class='list-decimal list-inside mt-2 text-sm space-y-1.5 text-right w-full font-semibold text-amber-950'><li>استخدم <b>نفس الأنبوبة</b> التي تحتوي على المحلول الجاهز من الخطوة السابقة.</li><li>أضف 2-3 قطرات من كاشف <b>كلوريد الحديديك (FeCl3)</b> تدريجياً.</li><li>رُج الأنبوبة قليلاً وراقب لون الراسب المتكون بدقة.</li></ol>",
+                question: "ما هو لون الراسب المتكون؟",
+                options: [
+                    { text: "تكون راسب بنفسجي", target: "salt_salicylate_base", note: "الشق الحامضي: ساليسيلات" },
+                    { text: "تكون راسب لحمي", target: "salt_fleshy_base", note: "الشق الحامضي: بنزوات أو فيثالات" }
+                ],
+                icon: icons.testTubePurple
+            },
+            acid_fecl3: {
+                title: "الخطوة 2: تحديد نوع الحمض",
+                typeTag: '<span class="inline-flex items-center gap-1 bg-purple-100 text-purple-800 text-sm font-bold px-3 py-1 rounded-full mb-3 border border-purple-200">💧 تُجرى على المعلق في نفس الأنبوبة</span>',
+                instruction: "المادة لم تذب (حمض). <b>خطوات إضافة كلوريد الحديديك:</b><br><ol class='list-decimal list-inside mt-2 text-sm space-y-1.5 text-right w-full font-semibold text-amber-950'><li>استخدم <b>نفس الأنبوبة</b> التي تحتوي على المادة غير الذائبة والماء (المعلق).</li><li>أضف 2-3 قطرات من كاشف <b>كلوريد الحديديك (FeCl3)</b> مباشرة عليها.</li><li>رُج الأنبوبة قليلاً ولاحظ لون الراسب المتكون.</li></ol>",
+                question: "ما هو لون الراسب المتكون؟",
+                options: [
+                    { text: "تكون راسب بنفسجي", isResult: true, resultName: "حمض الساليسيليك", formula: "C7H6O3" },
+                    { text: "تكون راسب لحمي", target: "acid_phth", note: "إما حمض فيثاليك أو بنزويك" }
+                ],
+                icon: icons.testTubeRed
+            },
+            acid_phth: {
+                title: "الخطوة 3: التفرقة بين الأحماض (اختبار الفيثالين)",
+                typeTag: '<span class="inline-flex items-center gap-1 bg-pink-100 text-pink-800 text-sm font-bold px-3 py-1 rounded-full mb-3 border border-pink-200">🧊 تُجرى على المادة الصلبة</span>',
+                instruction: "المادة حمض وأعطت راسب لحمي. <b>خطوات اختبار الفيثالين:</b><br><ol class='list-decimal list-inside mt-2 text-sm space-y-1.5 text-right w-full font-semibold text-amber-950'><li>في أنبوبة <b>جافة</b>، ضع القليل من المادة الصلبة.</li><li>أضف كمية مساوية من <b>الفينول الصلب</b> + قطرتين <b>حمض كبريتيك مركز</b>.</li><li>سخن على اللهب حتى ينصهر الخليط.</li><li>اتركه يبرد قليلاً، ثم صبه في كأس به <b>محلول هيدروكسيد صوديوم (NaOH)</b>.</li></ol>",
+                question: "ماذا حدث للون؟",
+                options: [
+                    { text: "يتكون لون وردي (Pink)", isResult: true, resultName: "حمض الفيثاليك", formula: "C8H6O4" },
+                    { text: "لا يتكون لون وردي", isResult: true, resultName: "حمض البنزويك", formula: "C7H6O2" }
+                ],
+                icon: icons.beakerPink
+            },
+            salt_salicylate_base: {
+                title: "الخطوة 3: تحديد قاعدة الملح (الصوديوم أم الأمونيوم)",
+                typeTag: '<span class="inline-flex items-center gap-1 bg-orange-100 text-orange-800 text-sm font-bold px-3 py-1 rounded-full mb-3 border border-orange-200">🔥 تُجرى على المادة الصلبة</span>',
+                instruction: "تأكدنا أنها 'ساليسيلات'. <b>خطوات اختبار هيدروكسيد الصوديوم:</b><br><ol class='list-decimal list-inside mt-2 text-sm space-y-1.5 text-right w-full font-semibold text-amber-950'><li>في أنبوبة اختبار <b>جديدة ونظيفة</b>، ضع عينة من <b>المادة الصلبة</b>.</li><li>أضف 1-2 مل من <b>محلول هيدروكسيد الصوديوم (NaOH)</b>.</li><li>امسك الأنبوبة بماسك <b>وسخنها برفق</b> على اللهب.</li><li>قرب الأنبوبة بحذر (مع التلويح بيدك) لشم الرائحة، هل تشم رائحة نشادر نفاذة؟</li></ol>",
+                question: "هل تتصاعد رائحة نشادر النفاذة؟",
+                options: [
+                    { text: "نعم، تتصاعد رائحة النشادر", isResult: true, resultName: "ساليسيلات الأمونيوم", formula: "C7H5O3NH4" },
+                    { text: "لا تتصاعد رائحة", isResult: true, resultName: "ساليسيلات الصوديوم", formula: "C7H5O3Na" }
+                ],
+                icon: icons.flaskOrange
+            },
+            salt_fleshy_base: {
+                title: "الخطوة 3: تحديد قاعدة الملح (الصوديوم أم الأمونيوم)",
+                typeTag: '<span class="inline-flex items-center gap-1 bg-orange-100 text-orange-800 text-sm font-bold px-3 py-1 rounded-full mb-3 border border-orange-200">🔥 تُجرى على المادة الصلبة</span>',
+                instruction: "المادة بنزوات أو فيثالات. <b>خطوات اختبار هيدروكسيد الصوديوم:</b><br><ol class='list-decimal list-inside mt-2 text-sm space-y-1.5 text-right w-full font-semibold text-amber-950'><li>في أنبوبة اختبار <b>جديدة ونظيفة</b>، ضع عينة من <b>المادة الصلبة</b>.</li><li>أضف 1-2 مل من <b>محلول هيدروكسيد الصوديوم (NaOH)</b>.</li><li>امسك الأنبوبة بماسك <b>وسخنها برفق</b> على اللهب.</li><li>قرب الأنبوبة بحذر (مع التلويح بيدك) لشم الرائحة، هل تشم رائحة نشادر نفاذة؟</li></ol>",
+                question: "هل تتصاعد رائحة نشادر النفاذة؟",
+                options: [
+                    { text: "نعم، تتصاعد رائحة النشادر", target: "nh4_phth", note: "الشق القاعدي أمونيوم" },
+                    { text: "لا تتصاعد رائحة", target: "na_phth", note: "الشق القاعدي صوديوم" }
+                ],
+                icon: icons.flaskOrange
+            },
+            nh4_phth: {
+                title: "الخطوة 4: التفرقة النهائية (بنزوات أم فيثالات الأمونيوم)",
+                typeTag: '<span class="inline-flex items-center gap-1 bg-pink-100 text-pink-800 text-sm font-bold px-3 py-1 rounded-full mb-3 border border-pink-200">🧊 تُجرى على المادة الصلبة</span>',
+                instruction: "عرفنا أنه ملح أمونيوم. <b>خطوات اختبار الفيثالين:</b><br><ol class='list-decimal list-inside mt-2 text-sm space-y-1.5 text-right w-full font-semibold text-amber-950'><li>في أنبوبة <b>جافة</b>، ضع القليل من المادة الصلبة.</li><li>أضف كمية مساوية من <b>الفينول الصلب</b> + قطرتين <b>حمض كبريتيك مركز</b>.</li><li>سخن على اللهب حتى ينصهر الخليط.</li><li>اتركه يبرد قليلاً، ثم صبه في كأس به <b>محلول هيدروكسيد صوديوم (NaOH)</b>.</li></ol>",
+                question: "ماذا حدث للون؟",
+                options: [
+                    { text: "يتكون لون وردي (Pink)", isResult: true, resultName: "فيثالات الأمونيوم", formula: "C8H4O4(NH4)2" },
+                    { text: "لا يتكون لون وردي", isResult: true, resultName: "بنزوات الأمونيوم", formula: "C7H5O2NH4" }
+                ],
+                icon: icons.beakerPink
+            },
+            na_phth: {
+                title: "الخطوة 4: التفرقة النهائية (بنزوات أم فيثالات الصوديوم)",
+                typeTag: '<span class="inline-flex items-center gap-1 bg-pink-100 text-pink-800 text-sm font-bold px-3 py-1 rounded-full mb-3 border border-pink-200">🧊 تُجرى على المادة الصلبة</span>',
+                instruction: "عرفنا أنه ملح صوديوم. <b>خطوات اختبار الفيثالين:</b><br><ol class='list-decimal list-inside mt-2 text-sm space-y-1.5 text-right w-full font-semibold text-amber-950'><li>في أنبوبة <b>جافة</b>، ضع القليل من المادة الصلبة.</li><li>أضف كمية مساوية من <b>الفينول الصلب</b> + قطرتين <b>حمض كبريتيك مركز</b>.</li><li>سخن على اللهب حتى ينصهر الخليط.</li><li>اتركه يبرد قليلاً، ثم صبه في كأس به <b>محلول هيدروكسيد صوديوم (NaOH)</b>.</li></ol>",
+                question: "ماذا حدث للون؟",
+                options: [
+                    { text: "يتكون لون وردي (Pink)", isResult: true, resultName: "فيثالات الصوديوم", formula: "C8H4O4Na2" },
+                    { text: "لا يتكون لون وردي", isResult: true, resultName: "بنزوات الصوديوم", formula: "C7H5O2Na" }
+                ],
+                icon: icons.beakerPink
+            }
+        };
+
+        // حالة التطبيق
+        let currentStepId = 'start';
+        let history = [];
+        let finalResult = null;
+
+        // دالة التحديث وإعادة بناء الواجهة
+        function render() {
+            const container = document.getElementById('app-container');
+            const step = stepsData[currentStepId];
+
+            let html = `
+                <!-- شريط التقدم والمعلومات -->
+                <div class="mb-6 flex items-center justify-between fade-in">
+                    <h1 class="text-2xl font-bold text-gray-800 flex items-center">مستر 
+                        <!-- الاسم مجزأ إلى حروف للحركة المستقلة -->
+                        <span class="name-wrapper">
+                            <span class="letter l-1">Y</span>
+                            <span class="letter l-2">o</span>
+                            <span class="letter l-3">u</span>
+                            <span class="letter l-4">s</span>
+                            <span class="letter l-5">e</span>
+                            <span class="letter l-6">f</span>
+                        </span>
+                    </h1>
+                    ${history.length > 0 ? `
+                        <button onclick="handleGoBack()" class="text-gray-500 hover:text-indigo-600 flex items-center gap-1 text-sm font-medium transition-colors">
+                            ${icons.arrowRight}
+                            تراجع للخطوة السابقة
+                        </button>
+                    ` : ''}
+                </div>
+            `;
+
+            // عرض الاستنتاجات السابقة
+            if (history.length > 0) {
+                html += `<div class="mb-6 flex flex-wrap gap-2 fade-in">`;
+                history.forEach(h => {
+                    if (h.selectedNote) {
+                        html += `
+                            <span class="bg-indigo-100 text-indigo-800 text-xs font-bold px-3 py-1.5 rounded-full flex items-center gap-1 border border-indigo-200">
+                                ${icons.checkCircleSm}
+                                ${h.selectedNote}
+                            </span>
+                        `;
+                    }
+                });
+                html += `</div>`;
+            }
+
+            // البطاقة الرئيسية
+            html += `<div class="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100 fade-in">`;
+
+            if (finalResult) {
+                // شاشة النتيجة النهائية
+                html += `
+                    <div class="p-10 text-center bg-green-50/30">
+                        <div class="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                            ${icons.checkCircleLg}
+                        </div>
+                        <h2 class="text-gray-500 font-semibold mb-2 text-lg">بناءً على خطواتك، المادة المجهولة هي:</h2>
+                        <div class="text-4xl font-black text-green-700 mb-4 bg-white p-6 rounded-2xl shadow-sm border border-green-100 inline-block">
+                            ${finalResult.name}
+                        </div>
+                        <p class="text-xl text-gray-400 font-mono mb-10" dir="ltr">${finalResult.formula}</p>
+                        
+                        <button onclick="handleRestart()" class="w-full sm:w-auto mx-auto bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-8 rounded-xl flex items-center justify-center gap-2 transition-all shadow-md hover:shadow-lg">
+                            ${icons.rotateCcw}
+                            فحص مادة مجهولة جديدة
+                        </button>
+                    </div>
+                `;
+            } else {
+                // شاشة الخطوات والأسئلة
+                html += `
+                    <div class="p-8 sm:p-10">
+                        <div class="flex flex-col items-center text-center mb-8">
+                            ${step.icon}
+                            <span class="text-sm font-bold text-indigo-500 tracking-wider mb-3 bg-indigo-50 px-4 py-1 rounded-full">
+                                ${step.title}
+                            </span>
+                            
+                            <!-- التجربة المطلوبة -->
+                            <div class="bg-amber-50 border-r-4 border-amber-400 p-4 rounded-l-lg mb-8 w-full text-right relative">
+                                ${step.typeTag ? step.typeTag : ''}
+                                <h3 class="text-amber-800 font-bold mb-1 mt-1">طريقة العمل:</h3>
+                                <p class="text-amber-900 leading-relaxed text-lg">${step.instruction}</p>
+                            </div>
+
+                            <h2 class="text-2xl font-bold text-gray-800">${step.question}</h2>
+                        </div>
+                        
+                        <!-- خيارات الإجابة -->
+                        <div class="space-y-4">
+                `;
+
+                step.options.forEach((option, idx) => {
+                    html += `
+                        <button onclick="handleOptionClick(${idx})" class="w-full text-right px-6 py-5 rounded-2xl border-2 border-gray-200 hover:border-indigo-500 hover:bg-indigo-50 transition-all duration-200 group flex items-center justify-between">
+                            <span class="text-lg font-semibold text-gray-700 group-hover:text-indigo-700">
+                                ${option.text}
+                            </span>
+                            ${icons.arrowLeft}
+                        </button>
+                    `;
+                });
+
+                html += `
+                        </div>
+                    </div>
+                `;
+            }
+
+            html += `</div>`;
+            container.innerHTML = html;
+        }
+
+        // معالجة اختيار خيار
+        window.handleOptionClick = function(optionIndex) {
+            const step = stepsData[currentStepId];
+            const option = step.options[optionIndex];
+
+            // حفظ الخطوة في السجل
+            history.push({ stepId: currentStepId, selectedNote: option.note });
+
+            if (option.isResult) {
+                finalResult = { name: option.resultName, formula: option.formula };
+            } else {
+                currentStepId = option.target;
+            }
+            render();
+        };
+
+        // معالجة التراجع خطوة للخلف
+        window.handleGoBack = function() {
+            if (finalResult) {
+                finalResult = null;
+            } else if (history.length > 0) {
+                const previousState = history.pop();
+                currentStepId = previousState.stepId;
+            }
+            render();
+        };
+
+        // معالجة البدء من جديد
+        window.handleRestart = function() {
+            currentStepId = 'start';
+            history = [];
+            finalResult = null;
+            render();
+        };
+
+        // إخفاء شاشة التحميل وإظهار التطبيق بعد مدة محددة
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                const loader = document.getElementById('loader');
+                const appContainer = document.getElementById('app-container');
+                
+                // إخفاء التحميل تدريجياً
+                loader.classList.add('opacity-0');
+                
+                setTimeout(() => {
+                    loader.classList.add('hidden'); // إزالته من مساحة العرض
+                    
+                    // إظهار واجهة التطبيق
+                    appContainer.classList.remove('hidden');
+                    
+                    // تأخير بسيط جداً للسماح للمتصفح برسم العنصر قبل عمل الأنيميشن (fade in)
+                    setTimeout(() => {
+                        appContainer.classList.remove('opacity-0');
+                        render(); // رسم الواجهة الأولى
+                    }, 50);
+
+                }, 700); // يجب أن تتوافق مع duration-700
+            }, 2500); // مدة عرض شاشة "صلي على النبي" (ثانيتين ونصف)
+        });
+
+    </script>
+</body>
+</html>
